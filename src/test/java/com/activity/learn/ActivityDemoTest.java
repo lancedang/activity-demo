@@ -70,13 +70,36 @@ public class ActivityDemoTest {
         TaskService taskService = processEngine.getTaskService();
         TaskQuery taskQuery = taskService.createTaskQuery();
 
-        String assignee = "张三";
+        //assignee为task的执行人
+        String assignee = "王思聪";
         List<Task> taskLists = taskQuery.taskAssignee(assignee).list();
 
         for (Task task : taskLists) {
-            logger.info("assignee={}, category={}, createTime={}, description={}", task.getAssignee(), task.getCategory(), task.getCreateTime(), task.getDescription());
+            logger.info("taskId={}, assignee={}, category={}, createTime={}, description={}", task.getId(), task.getAssignee(), task.getCategory(), task.getCreateTime(), task.getDescription());
         }
     }
+
+    /**
+     * 启动某个task，该task结束后，流程进入第二个task
+     */
+    @Test
+    public void startFirstTask() {
+        //taskId从DB中ru_task中获取
+        String taskId = "10004";
+        TaskService taskService = processEngine.getTaskService();
+        taskService.complete(taskId);
+    }
+
+    /**
+     * 执行完上面FirstTask后，执行第二个task
+     */
+    @Test
+    public void startSecondTask() {
+        String taskId = "12502";
+        TaskService taskService = processEngine.getTaskService();
+        taskService.complete(taskId);
+    }
+
 
     /**
      * 查询工作流Process信息
@@ -87,8 +110,10 @@ public class ActivityDemoTest {
         RepositoryService repositoryService = processEngine.getRepositoryService();
         ProcessDefinitionQuery processDefinitionQuery = repositoryService.createProcessDefinitionQuery();
 
+        //按照主键Id查询
         //processDefinitionQuery.processDefinitionId("myProcess_1:1:4");
 
+        //按照Key查询
         processDefinitionQuery.processDefinitionKey("myProcess_1");
 
         List<ProcessDefinition> processDefinitions = processDefinitionQuery.list();
